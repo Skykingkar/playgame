@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wallet App</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+
+      .container {
+        background-color: white;
+        max-width: 600px;
+        width: 100%;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 20px;
+      }
+
+      .wallet-balance {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #28a745;
+      }
+
+      .predefined-amounts {
+        margin-top: 10px;
+      }
+
+      .predefined-amounts .btn {
+        margin-right: 5px;
+        margin-bottom: 10px;
+      }
+
+      #message {
+        margin-top: 20px;
+        font-size: 1rem;
+        color: green;
+      }
+
+      .qr-code img {
+        width: 100%;
+        height: auto;
+      }
+
+      /* Blinking Banner Styles */
+      .banner {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        overflow: hidden;
+        width: 100%;
+        animation: blink 1s infinite;
+        height: 200px;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .banner img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+      }
+
+      .banner-text {
+        position: relative;
+        z-index: 2;
+        font-size: 2rem;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Profile Section -->
+      <div class="section profile d-flex align-items-center mb-4">
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHOyweUERP_PkAHflHnp-jMxGTx_D-DD638A&s"
+          alt="User Image"
+          id="userImage"
+          class="me-3"
+          style="
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+          "
+        />
+        <div class="profile-info">
+          <h2>User Profile</h2>
+          <div class="icon-text">
+            <i class="bi bi-person-circle"></i>
+            <p>User Name: <span id="userName">John Doe</span></p>
+          </div>
+          <div class="icon-text">
+            <i class="bi bi-person-fill"></i>
+            <p>Name: <span id="userRealName">Jane Smith</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wallet Section -->
+      <div class="section wallet mb-4">
+        <h2>Wallet Balance</h2>
+        <p class="wallet-balance">₹<span id="walletBalance">100</span></p>
+      </div>
+
+      <!-- Transaction Section -->
+      <div class="section transaction">
+        <h2>Manage Wallet</h2>
+        <div class="input-group mb-3">
+          <input
+            type="number"
+            class="form-control"
+            id="transactionAmount"
+            placeholder="Enter Amount"
+            oninput="validateAmount()"
+          />
+          <button
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#qrCodeModal"
+            id="rechargeButton"
+            disabled
+          >
+            <i class="bi bi-wallet2"></i> Recharge
+          </button>
+          <button
+            class="btn btn-danger ms-2"
+            data-bs-toggle="modal"
+            data-bs-target="#withdrawModal"
+            id="withdrawButton"
+            disabled
+          >
+            <i class="bi bi-arrow-down-circle"></i> Withdraw
+          </button>
+        </div>
+
+        <!-- Predefined Amount Buttons for Recharge -->
+        <div class="predefined-amounts">
+          <button class="btn btn-outline-primary" onclick="setAmount(100)">
+            ₹100
+          </button>
+          <button class="btn btn-outline-primary" onclick="setAmount(200)">
+            ₹200
+          </button>
+          <button class="btn btn-outline-primary" onclick="setAmount(500)">
+            ₹500
+          </button>
+          <button class="btn btn-outline-primary" onclick="setAmount(15000)">
+            ₹15,000
+          </button>
+          <button class="btn btn-outline-primary" onclick="setAmount(45000)">
+            ₹45,000
+          </button>
+        </div>
+
+        <!-- Predefined Amount Buttons for Withdraw -->
+        <h4>Withdraw Amounts</h4>
+        <div class="predefined-amounts">
+          <button class="btn btn-outline-danger" onclick="setAmount(100)">
+            ₹100
+          </button>
+          <button class="btn btn-outline-danger" onclick="setAmount(200)">
+            ₹200
+          </button>
+          <button class="btn btn-outline-danger" onclick="setAmount(500)">
+            ₹500
+          </button>
+          <button class="btn btn-outline-danger" onclick="setAmount(15000)">
+            ₹15,000
+          </button>
+          <button class="btn btn-outline-danger" onclick="setAmount(45000)">
+            ₹45,000
+          </button>
+        </div>
+      </div>
+
+      <!-- Blinking Banner Section for Play Game -->
+      <div
+        class="banner"
+        onclick="window.location.href='https://example.com/online-game'"
+      >
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRx577q62vEcNtsYkRGL-Gu_n43sAZ-qO2itA&s"
+          alt="Game Icon"
+        />
+        <span class="banner-text">Play Online Game</span>
+      </div>
+
+      <!-- Transaction Message -->
+      <div id="message"></div>
+    </div>
+
+    <!-- QR Code Modal for Recharge -->
+    <div
+      class="modal fade"
+      id="qrCodeModal"
+      tabindex="-1"
+      aria-labelledby="qrCodeModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="qrCodeModalLabel">Scan QR Code</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="qr-code">
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaXdqfbyMxwTGYFnE1sWj9-H8tkV7onNzoPg&s"
+                alt="QR Code"
+              />
+              <p>
+                Scan this QR code to recharge your wallet with the selected
+                amount!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div
+      class="modal fade"
+      id="withdrawModal"
+      tabindex="-1"
+      aria-labelledby="withdrawModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="withdrawModalLabel">
+              Enter Account Information
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="withdrawForm">
+              <div class="mb-3">
+                <label for="accountName" class="form-label">Account Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="accountName"
+                  placeholder="Enter Account Name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="accountNumber" class="form-label"
+                  >Account Number</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="accountNumber"
+                  placeholder="Enter Account Number"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="ifscCode" class="form-label">IFSC Code</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ifscCode"
+                  placeholder="Enter IFSC Code"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="upiId" class="form-label">UPI ID</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="upiId"
+                  placeholder="Enter UPI ID"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                onclick="withdraw()"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>WhatApp Helpline No: <span id="userEmail">9112512178</span></p>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+      let walletBalance = 100;
+
+      function setAmount(amount) {
+        document.getElementById("transactionAmount").value = amount;
+        validateAmount();
+      }
+
+      function validateAmount() {
+        const amount = parseFloat(
+          document.getElementById("transactionAmount").value
+        );
+        document.getElementById("rechargeButton").disabled =
+          isNaN(amount) || amount <= 0;
+        document.getElementById("withdrawButton").disabled =
+          isNaN(amount) || amount <= 0 || amount > walletBalance;
+      }
+
+      function recharge() {
+        const amount = parseFloat(
+          document.getElementById("transactionAmount").value
+        );
+        if (isNaN(amount) || amount <= 0) {
+          showMessage("Please enter a valid amount.");
+          return;
+        }
+        walletBalance += amount;
+        updateWalletBalance();
+        showMessage("Recharge successful!");
+      }
+
+      function withdraw() {
+        const amount = parseFloat(
+          document.getElementById("transactionAmount").value
+        );
+        if (amount > walletBalance) {
+          showMessage("Insufficient balance.");
+          return;
+        }
+        walletBalance -= amount;
+        updateWalletBalance();
+        showMessage("Withdrawal successful!");
+      }
+
+      function updateWalletBalance() {
+        document.getElementById("walletBalance").innerText =
+          walletBalance.toFixed(2);
+      }
+
+      function showMessage(message) {
+        const messageElement = document.getElementById("message");
+        messageElement.innerText = message;
+        setTimeout(() => {
+          messageElement.innerText = "";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
